@@ -1,14 +1,14 @@
 from __future__ import annotations
 from typing import Any, Optional, Dict
-from pyhtmx import Div, Button  # type: ignore
+from pyhtmx import Div, Button, Img  # type: ignore
 from pyhtmx_gui.kit import Widget, SessionItem, Control, Page
 
 
-class SystemTextFrameWidget(Widget):
-    _parameters = ("title", "text")
+class SystemImageFrameWidget(Widget):
+    _parameters = ("title", "caption", "image", "fill", "background_color")
 
     def __init__(
-        self: SystemTextFrameWidget,
+        self: SystemImageFrameWidget,
         session_data: Optional[Dict[str, Any]] = None,
     ):
         session_data = session_data or {}
@@ -18,7 +18,9 @@ class SystemTextFrameWidget(Widget):
         )
 
         title_text = session_data.get("title", "")
+        caption_text = session_data.get("caption", "")
         has_title = bool(title_text)
+        has_caption = bool(caption_text)
 
         self._title: Div = Div(
             inner_content=title_text,
@@ -35,17 +37,35 @@ class SystemTextFrameWidget(Widget):
             ),
         )
 
-        self._main_text: Div = Div(
-            inner_content=session_data.get("text"),
-            _id="text",
+        self._caption: Div = Div(
+            inner_content=caption_text,
+            _id="caption",
             _class="text-gray-900 text-[6vw] font-bold leading-tight text-center",
+            style={"display": "block" if has_caption else "none"},
         )
         self.add_interaction(
-            "text",
+            "caption",
             SessionItem(
-                parameter="text",
+                parameter="caption",
                 attribute="inner_content",
-                component=self._main_text,
+                component=self._caption,
+            ),
+        )
+
+        # Weather icon
+        self._image: Img = Img(
+            _id="image",
+            src=session_data.get("image", ""),
+            width="auto",
+            height="auto",
+            style={"filter": "drop-shadow(0.5vw 0.5vh 1vw #272727)"},
+        )
+        self.add_interaction(
+            "image",
+            SessionItem(
+                parameter="image",
+                attribute="src",
+                component=self._image,
             ),
         )
 
@@ -70,10 +90,13 @@ class SystemTextFrameWidget(Widget):
         self._widget: Div = Div(
             [
                 self._title,
-                self._main_text,
+                Div(
+                    [self._image, self._caption],
+                    _class="flex-1 flex items-center justify-center",
+                ),
                 self._button,
             ],
-            _id="system-text-frame-widget",
+            _id="system-image-frame-widget",
             _class=[
                 "p-[2vw]",
                 "flex",
@@ -82,28 +105,28 @@ class SystemTextFrameWidget(Widget):
                 "justify-center",
                 "rounded-2xl",
                 "shadow-xl",
-                "bg-blue-100",  # lichte achtergrond, net als weather widget
             ],
             style={
                 "width": "80vw",
                 "height": "80vh",
+                "background-color": session_data.get("background_color", "rgba(255, 255, 255, 0.8)"),
             },
         )
 
 
-class SystemTextFramePage(Page):
+class SystemImageFramePage(Page):
 
     def __init__(
-        self: SystemTextFramePage,
+        self: SystemImageFramePage,
         session_data: Optional[Dict[str, Any]] = None,
     ):
-        super().__init__(name="system-text-frame-page", session_data=session_data)
+        super().__init__(name="system-image-frame-page", session_data=session_data)
 
-        widget = SystemTextFrameWidget(session_data=session_data)
+        widget = SystemImageFrameWidget(session_data=session_data)
 
         background_container = Div(
             [widget._widget],
-            _id="system-text-frame-bg",
+            _id="system-image-frame-bg",
             _class=[
                 "h-full",
                 "w-full",
@@ -122,7 +145,7 @@ class SystemTextFramePage(Page):
 
         self._page: Div = Div(
             [background_container],
-            _id="system-text-frame-page",
+            _id="system-image-frame-page",
             _class="flex flex-col",
             style={
                 "width": "100vw",
