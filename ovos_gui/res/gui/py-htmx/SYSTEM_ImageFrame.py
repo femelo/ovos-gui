@@ -4,8 +4,11 @@ from pyhtmx import Div, Button, Img  # type: ignore
 from pyhtmx_gui.kit import Widget, SessionItem, Control, Page
 
 
+SKILLS_DATA_PATH = "/skills"
+
+
 class SystemImageFrameWidget(Widget):
-    _parameters = ("title", "caption", "image", "fill", "background_color")
+    _parameters = ("title", "caption", "image_path", "fill", "background_color")
 
     def __init__(
         self: SystemImageFrameWidget,
@@ -55,7 +58,7 @@ class SystemImageFrameWidget(Widget):
         # Weather icon
         self._image: Img = Img(
             _id="image",
-            src=session_data.get("image", ""),
+            src=f"{SKILLS_DATA_PATH}/{session_data.get('image_path', '')}",
             width="auto",
             height="auto",
             style={"filter": "drop-shadow(0.5vw 0.5vh 1vw #272727)"},
@@ -63,9 +66,10 @@ class SystemImageFrameWidget(Widget):
         self.add_interaction(
             "image",
             SessionItem(
-                parameter="image",
+                parameter="image_path",
                 attribute="src",
                 component=self._image,
+                format_value=lambda pth: f"{SKILLS_DATA_PATH}/{pth}",
             ),
         )
 
