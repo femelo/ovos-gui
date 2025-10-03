@@ -1,14 +1,17 @@
 from __future__ import annotations
+import os
 from typing import Any, Optional, Dict
 from pyhtmx import Div, Button, Img  # type: ignore
 from pyhtmx_gui.kit import Widget, SessionItem, Control, Page
+from ovos_workshop.filesystem import FileSystemAccess
 
 
-SKILLS_DATA_PATH = "/skills"
+FS_SKILLS_PATH = FileSystemAccess("skills").path
+LOCAL_PATH_TEMPLATE = "/skills/{image_path}"
 
 
 class SystemImageFrameWidget(Widget):
-    _parameters = ("title", "caption", "image_path", "fill", "background_color")
+    _parameters = ("title", "caption", "image", "fill", "background_color")
 
     def __init__(
         self: SystemImageFrameWidget,
@@ -55,10 +58,10 @@ class SystemImageFrameWidget(Widget):
             ),
         )
 
-        # Weather icon
+        # Result image
         self._image: Img = Img(
-            _id="image",
-            src=f"{SKILLS_DATA_PATH}/{session_data.get('image_path', '')}",
+            _id="result-image",
+            src=self.translate_image_path(session_data.get("image", '')),
             width="auto",
             height="auto",
             style={"filter": "drop-shadow(0.5vw 0.5vh 1vw #272727)"},
@@ -66,10 +69,10 @@ class SystemImageFrameWidget(Widget):
         self.add_interaction(
             "image",
             SessionItem(
-                parameter="image_path",
+                parameter="result-image",
                 attribute="src",
                 component=self._image,
-                format_value=lambda pth: f"{SKILLS_DATA_PATH}/{pth}",
+                format_value=self.translate_image_path,
             ),
         )
 
@@ -115,6 +118,11 @@ class SystemImageFrameWidget(Widget):
                 "height": "80vh",
                 "background-color": session_data.get("background_color", "rgba(255, 255, 255, 0.8)"),
             },
+        )
+
+    def translate_image_path(self: SystemImageFrameWidget, image_path: str) -> str:
+        return LOCAL_PATH_TEMPLATE.format(
+            image_path=os.path.relpath(image_path, FS_SKILLS_PATH)
         )
 
 
