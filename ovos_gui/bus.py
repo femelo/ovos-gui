@@ -115,7 +115,6 @@ class GUIWebsocketHandler(WebSocketHandler):
         """
         GUIWebsocketHandler.clients.append(self)
         LOG.info('New Connection opened!')
-        self.synchronize()
 
     def on_close(self):
         """
@@ -213,6 +212,7 @@ class GUIWebsocketHandler(WebSocketHandler):
                     framework = "qt5"
 
             self._framework = framework
+            self.synchronize()
         else:
             # message not in spec
             # https://github.com/MycroftAI/mycroft-gui/blob/master/transportProtocol.md
