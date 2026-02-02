@@ -476,6 +476,7 @@ class NamespaceManager:
             "recognizer_loop:wake_up",
             "mycroft.awoken",
             "recognizer_loop:utterance",
+            "recognizer_loop:utterance_start",
             "recognizer_loop:wakeword",
             "recognizer_loop:recognition_unknown",
             "recognizer_loop:record_begin",
